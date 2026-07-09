@@ -148,8 +148,9 @@ class AuraService : AccessibilityService() {
 
     private fun getUsernameFromNode(node: AccessibilityNodeInfo): String? {
         node.text?.let { text ->
-            if (text.contains("@")) return text.substringAfter("@").toString().trim()
-            if (text.length in 3..20 && text.matches(Regex("[a-zA-Z0-9_\\u0600-\\u06FF]+"))) return text.trim()
+            val textStr = text.toString()
+            if (textStr.contains("@")) return textStr.substringAfter("@").trim()
+            if (textStr.length in 3..20 && textStr.matches(Regex("[a-zA-Z0-9_\\u0600-\\u06FF]+"))) return textStr.trim()
         }
         return null
     }
