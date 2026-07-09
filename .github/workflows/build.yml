@@ -9,8 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Setup JDK 17
       uses: actions/setup-java@v4
@@ -18,13 +17,24 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Generate Gradle Wrapper
+    - name: Create Gradle Wrapper
       run: |
         mkdir -p gradle/wrapper
-        curl -o gradlew https://raw.githubusercontent.com/il12ya/AuraSender/main/gradlew
-        curl -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/il12ya/AuraSender/main/gradle/wrapper/gradle-wrapper.jar
-        curl -o gradle/wrapper/gradle-wrapper.properties https://raw.githubusercontent.com/il12ya/AuraSender/main/gradle/wrapper/gradle-wrapper.properties
+        cat > gradlew << 'EOF'
+        #!/bin/sh
+        exec gradle "$@"
+        EOF
         chmod +x gradlew
+        
+        cat > gradle/wrapper/gradle-wrapper.properties << EOF
+        distributionBase=GRADLE_USER_HOME
+        distributionPath=wrapper/dists
+        distributionUrl=https\://services.gradle.org/distributions/gradle-8.4-bin.zip
+        zipStoreBase=GRADLE_USER_HOME
+        zipStorePath=wrapper/dists
+        EOF
+        
+        curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.4.0/gradle/wrapper/gradle-wrapper.jar
 
     - name: Build Debug APK
       run: ./gradlew assembleDebug --stacktrace
